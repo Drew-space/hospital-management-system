@@ -7,14 +7,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
 import {
   Field,
   FieldDescription,
@@ -29,6 +22,7 @@ import {
   InputGroupText,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
+import CustomFormField from "../CustomFormField";
 
 const formSchema = z.object({
   name: z
@@ -63,26 +57,17 @@ const PatientForm = () => {
   }
 
   return (
-    <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
-      <FieldGroup>
-        <Controller
-          name="name"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="form-rhf-demo-title">Bug Title</FieldLabel>
-              <Input
-                {...field}
-                id="form-rhf-demo-title"
-                aria-invalid={fieldState.invalid}
-                placeholder="Login button not working on mobile"
-                autoComplete="off"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-      </FieldGroup>
+    <form
+      id="form-rhf-demo"
+      className="space-y-6 flex-1"
+      onSubmit={form.handleSubmit(onSubmit)}
+    >
+      <section className="mb-12 space-y-6">
+        <h1 className="header">Hi there 👋</h1>
+        <p className="text-dark-700">Schedule your first appointment. </p>
+      </section>
+      {/*  */}
+      <CustomFormField control={form.control} />
 
       <Field orientation="horizontal">
         <Button type="button" variant="outline" onClick={() => form.reset()}>
