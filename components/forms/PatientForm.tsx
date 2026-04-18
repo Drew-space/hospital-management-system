@@ -2,81 +2,84 @@
 
 import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
-
 import { Button } from "@/components/ui/button";
-
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  InputGroupTextarea,
-} from "@/components/ui/input-group";
-import CustomFormField from "../CustomFormField";
-
-const formSchema = z.object({
-  name: z
-    .string()
-    .min(5, "Bug title must be at least 5 characters.")
-    .max(32, "Bug title must be at most 32 characters."),
-});
+import { Field } from "@/components/ui/field";
+import CustomFormField, { FormFieldType } from "../CustomFormField";
+import SubmitButton from "../SubmitButton";
+import { UserFormValidation } from "@/lib/validation";
+import { useRouter } from "next/navigation";
 
 const PatientForm = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const router = useRouter();
+  const [isLoading, setIsLoading] = React.useState(false);
+  const form = useForm<z.infer<typeof UserFormValidation>>({
+    resolver: zodResolver(UserFormValidation),
     defaultValues: {
       name: "",
+      email: "",
+      phone: "",
     },
   });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    toast("You submitted the following values:", {
-      description: (
-        <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
-          <code>{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-      position: "bottom-right",
-      classNames: {
-        content: "flex flex-col gap-2",
-      },
-      style: {
-        "--border-radius": "calc(var(--radius)  + 4px)",
-      } as React.CSSProperties,
-    });
+  async function onSubmit({
+    name,
+    email,
+    phone,
+  }: z.infer<typeof UserFormValidation>) {
+    setIsLoading(true);
+    try {
+      // const userData = { name, email, phone };
+      // const user = await createUser(userData);
+      // if (user) router.push(`/patients/${user.$id}/register`);
+    } catch (error) {}
+    console.log(error);
   }
 
   return (
-    <form
-      id="form-rhf-demo"
-      className="space-y-6 flex-1"
-      onSubmit={form.handleSubmit(onSubmit)}
-    >
-      <section className="mb-12 space-y-6">
+    <form className="space-y-6 flex-1" onSubmit={form.handleSubmit(onSubmit)}>
+      <section className="mb-12 space-y-4">
         <h1 className="header">Hi there 👋</h1>
-        <p className="text-dark-700">Schedule your first appointment. </p>
+        <p className="text-dark-700">Schedule your first appointment.</p>
       </section>
-      {/*  */}
-      <CustomFormField control={form.control} />
 
-      <Field orientation="horizontal">
+      <CustomFormField
+        fieldType={FormFieldType.INPUT}
+        control={form.control}
+        name="name"
+        label="Full Name"
+        placeholder="John Doe"
+        iconSrc="/assets/icons/user.svg"
+        iconAlt="user"
+      />
+
+      <CustomFormField
+        fieldType={FormFieldType.INPUT}
+        control={form.control}
+        name="email"
+        label="Email"
+        placeholder="john@example.com"
+        iconSrc="/assets/icons/email.svg"
+        iconAlt="email"
+      />
+
+      <CustomFormField
+        fieldType={FormFieldType.PHONE_INPUT}
+        control={form.control}
+        name="phone"
+        label="Phone Number"
+        placeholder="+1 (555) 000-0000"
+      />
+
+      <SubmitButton isLoading={isLoading}>Get Started</SubmitButton>
+
+      {/* <Field orientation="horizontal">
         <Button type="button" variant="outline" onClick={() => form.reset()}>
           Reset
         </Button>
-        <Button type="submit" form="form-rhf-demo">
-          Submit
-        </Button>
-      </Field>
+        <Button type="submit">Submit</Button>
+      </Field> */}
     </form>
   );
 };

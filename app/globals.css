@@ -94,6 +94,35 @@
     display: none;
   }
 
+  /* ===== REACT PHONE NUMBER INPUT OVERRIDES */
+  .PhoneInputInput {
+    outline: none;
+    margin-left: 4px;
+    background: #1a1d21;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .PhoneInputInput::placeholder {
+    color: #76828d;
+  }
+
+  /* This is the one fixing the white dropdown */
+  .PhoneInputCountrySelect {
+    background-color: #1a1d21;
+    color: #abb8c4;
+    border: none;
+    outline: none;
+  }
+
+  .PhoneInputCountrySelectArrow {
+    color: #abb8c4;
+  }
+
+  .PhoneInputCountryIcon {
+    margin-right: 4px;
+  }
+
   .left-sidebar {
     @apply hidden lg:flex;
   }
