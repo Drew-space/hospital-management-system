@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const fontSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -21,10 +22,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("h-full", "antialiased", fontSans.variable)}>
+    <html
+      suppressHydrationWarning
+      lang="en"
+      className={cn("h-full", "antialiased", fontSans.variable)}
+    >
       <body className="min-h-full bg-dark-300 flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="dark">
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
