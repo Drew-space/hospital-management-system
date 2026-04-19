@@ -1,11 +1,15 @@
 import React from "react";
 import Image from "next/image";
 import { Control, Controller, FieldValues, Path } from "react-hook-form";
-import { Field, FieldError, FieldGroup, FieldLabel } from "./ui/field";
+import { Field, FieldError, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import PhoneInput from "react-phone-number-input";
+import DatePicker from "react-datepicker";
 import "react-phone-number-input/style.css";
+import "react-datepicker/dist/react-datepicker.css";
+import { Select, SelectContent, SelectTrigger, SelectValue } from "./ui/select";
+import { Checkbox } from "./ui/checkbox";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -15,6 +19,7 @@ export enum FormFieldType {
   DATE_PICKER = "datePicker",
   SELECT = "select",
   SKELETON = "skeleton",
+  GENDER = "gender",
 }
 
 interface CustomProps<T extends FieldValues> {
@@ -25,21 +30,31 @@ interface CustomProps<T extends FieldValues> {
   placeholder?: string;
   iconSrc?: string;
   iconAlt?: string;
+  children?: React.ReactNode;
   disabled?: boolean;
+  dateFormat?: string;
+  showTimeSelect?: boolean;
   renderSkeleton?: (field: any) => React.ReactNode;
+  className?: string;
 }
 
-// Renders the correct input based on fieldType
 const RenderField = <T extends FieldValues>({
   field,
-  fieldState,
   props,
 }: {
   field: any;
   fieldState: any;
   props: CustomProps<T>;
 }) => {
-  const { fieldType, placeholder, iconSrc, iconAlt, renderSkeleton } = props;
+  const {
+    fieldType,
+    placeholder,
+    iconSrc,
+    iconAlt,
+    renderSkeleton,
+    dateFormat,
+    showTimeSelect,
+  } = props;
 
   switch (fieldType) {
     case FormFieldType.INPUT:
@@ -71,6 +86,40 @@ const RenderField = <T extends FieldValues>({
           disabled={props.disabled}
         />
       );
+    case FormFieldType.CHECKBOX:
+      return (
+        <div className="flex items-center gap-4">
+          <Checkbox
+            id={props.name}
+            checked={field.value}
+            onCheckedChange={field.onChange}
+          />
+          <label htmlFor={props.name} className="checkbox-label">
+            {props.label}
+          </label>
+        </div>
+      );
+
+    case FormFieldType.DATE_PICKER:
+      return (
+        <div className="flex rounded-md border border-dark-500 bg-dark-400">
+          <Image
+            src="/assets/icons/calendar.svg"
+            height={24}
+            width={24}
+            alt="calendar"
+            className="ml-2"
+          />
+          <DatePicker
+            selected={field.value}
+            onChange={(date) => field.onChange(date)}
+            dateFormat={dateFormat ?? "MM/dd/yyyy"}
+            showTimeSelect={showTimeSelect ?? false}
+            timeInputLabel="Time"
+            wrapperClassName="date-picker"
+          />
+        </div>
+      );
 
     case FormFieldType.PHONE_INPUT:
       return (
@@ -84,9 +133,30 @@ const RenderField = <T extends FieldValues>({
           className="input-phone"
         />
       );
+    case FormFieldType.GENDER:
+      return (
+        <select
+          {...field}
+          className="flex h-11 w-full rounded-md border border-dark-500 bg-dark-400 px-3 text-sm text-white"
+        >
+          <option value="">Select gender</option>
+          {props.children}
+        </select>
+      );
 
+    case FormFieldType.SELECT:
+      return (
+        <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <SelectTrigger className="shad-select-trigger">
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+          <SelectContent className="shad-select-content">
+            {props.children}
+          </SelectContent>
+        </Select>
+      );
     case FormFieldType.SKELETON:
-      return renderSkeleton ? renderSkeleton(field) : null;
+      return props.renderSkeleton ? props.renderSkeleton(field) : null;
 
     default:
       return null;
@@ -94,14 +164,14 @@ const RenderField = <T extends FieldValues>({
 };
 
 const CustomFormField = <T extends FieldValues>(props: CustomProps<T>) => {
-  const { control, name, label, fieldType } = props;
+  const { control, name, label, fieldType, className } = props;
 
   return (
     <Controller
       name={name}
       control={control}
       render={({ field, fieldState }) => (
-        <Field data-invalid={fieldState.invalid}>
+        <Field className={className} data-invalid={fieldState.invalid}>
           {label && fieldType !== FormFieldType.CHECKBOX && (
             <FieldLabel>{label}</FieldLabel>
           )}
