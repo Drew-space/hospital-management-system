@@ -176,7 +176,11 @@ const CustomFormField = <T extends FieldValues>(props: CustomProps<T>) => {
             <FieldLabel>{label}</FieldLabel>
           )}
           <RenderField field={field} fieldState={fieldState} props={props} />
-          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          {fieldState.error && (
+            <p className="text-red-400 text-[12px] mt-1">
+              {fieldState.error.message}
+            </p>
+          )}
         </Field>
       )}
     />

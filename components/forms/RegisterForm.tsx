@@ -14,8 +14,11 @@ import { SelectItem } from "../ui/select";
 import Image from "next/image";
 
 import { FileUploader } from "../FileUploader";
+import { useRouter } from "next/navigation";
+import { registerPatient } from "@/lib/actions/patient.action";
 
 const RegisterForm = ({ user }: { user: User }) => {
+  const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<
@@ -23,13 +26,14 @@ const RegisterForm = ({ user }: { user: User }) => {
     object,
     z.infer<typeof PatientFormValidation>
   >({
+    // @ts-expect-error "ignore"
     resolver: zodResolver(PatientFormValidation),
     defaultValues: {
       name: "",
       email: "",
       phone: "",
       birthDate: new Date(),
-      gender: "Male" as const,
+      gender: "male" as const,
       address: "",
       occupation: "",
       emergencyContactName: "",
@@ -52,8 +56,56 @@ const RegisterForm = ({ user }: { user: User }) => {
 
   async function onSubmit(values: z.infer<typeof PatientFormValidation>) {
     setIsLoading(true);
+
+    // Store file info in form data as
+    let formData;
+    if (
+      values.identificationDocument &&
+      values.identificationDocument?.length > 0
+    ) {
+      const blobFile = new Blob([values.identificationDocument[0]], {
+        type: values.identificationDocument[0].type,
+      });
+
+      formData = new FormData();
+      formData.append("blobFile", blobFile);
+      formData.append("fileName", values.identificationDocument[0].name);
+    }
+
     try {
-      console.log(values);
+      const patient = {
+        userId: user.$id,
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        birthDate: new Date(values.birthDate),
+        gender: values.gender,
+        address: values.address,
+        occupation: values.occupation,
+        emergencyContactName: values.emergencyContactName,
+        emergencyContactNumber: values.emergencyContactNumber,
+        primaryPhysician: values.primaryPhysician,
+        insuranceProvider: values.insuranceProvider,
+        insurancePolicyNumber: values.insurancePolicyNumber,
+        allergies: values.allergies,
+        currentMedication: values.currentMedication,
+        familyMedicalHistory: values.familyMedicalHistory,
+        pastMedicalHistory: values.pastMedicalHistory,
+        identificationType: values.identificationType,
+        identificationNumber: values.identificationNumber,
+        identificationDocument: values.identificationDocument
+          ? formData
+          : undefined,
+        treatmentConsent: values.treatmentConsent, // ← add this
+        disclosureConsent: values.disclosureConsent, // ← add this
+        privacyConsent: values.privacyConsent,
+      };
+
+      const newPatient = await registerPatient(patient);
+
+      if (newPatient) {
+        router.push(`/patients/${user.$id}/new-appointment`);
+      }
     } catch (error) {
       console.log(error);
     } finally {
