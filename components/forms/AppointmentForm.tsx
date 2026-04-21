@@ -18,16 +18,24 @@ import { createUser } from "@/lib/actions/patient.action";
 import { SelectItem } from "../ui/select";
 import Image from "next/image";
 import { Doctors } from "@/constance";
-import { createAppointment } from "@/lib/actions/appointment.action";
+import {
+  createAppointment,
+  updateAppointment,
+} from "@/lib/actions/appointment.action";
+import { Appointment } from "@/lib/actions/appwrite.types";
 
 const AppointmentForm = ({
   userId,
   patientId,
   type,
+  appointment,
+  setOpen,
 }: {
   userId: string;
   patientId: string;
   type: "create" | "cancel" | "schedule";
+  appointment?: Appointment;
+  setOpen?: (open: boolean) => void;
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
@@ -41,13 +49,58 @@ const AppointmentForm = ({
     // @ts-expect-error - zod coerce.date type inference quirk
     resolver: zodResolver(AppointmentFormValidation),
     defaultValues: {
-      primaryPhysician: "",
-      schedule: new Date(),
-      reason: "",
-      note: "",
-      cancellationReason: "",
+      primaryPhysician: appointment?.primaryPhysician ?? "",
+      schedule: appointment ? new Date(appointment.schedule) : new Date(),
+      reason: appointment?.reason ?? "",
+      note: appointment?.note ?? "",
+      cancellationReason: appointment?.cancellationReason ?? "",
     },
   });
+
+  //   async function onSubmit(values: z.infer<typeof AppointmentFormValidation>) {
+  //     setIsLoading(true);
+
+  //     let status;
+  //     switch (type) {
+  //       case "schedule":
+  //         status = "scheduled";
+  //         break;
+  //       case "cancel":
+  //         status = "cancelled";
+  //         break;
+  //       default:
+  //         status = "pending";
+  //     }
+
+  //     try {
+  //       if (type === "create" && patientId) {
+  //         const appointmentData = {
+  //           userId,
+  //           patient: patientId,
+  //           primaryPhysician: values.primaryPhysician,
+  //           schedule: new Date(values.schedule),
+  //           reason: values.reason!,
+  //           status: status as Status,
+  //           note: values.note,
+  //         };
+
+  //         const newAppointment = await createAppointment(appointmentData);
+  //         if (newAppointment) {
+  //           form.reset();
+  //           router.push(
+  //             `/patients/${userId}/new-appointment/success?appointmentId=${newAppointment.$id}`,
+  //           );
+  //         }
+  //       }
+
+  //       if (type === "schedule" || type === "cancel") {
+  //         // call updateAppointment here later
+  //         setOpen && setOpen(false);
+  //       }
+  //     } catch (error) {
+  //       console.log("error");
+  //     }
+  //   }
 
   async function onSubmit(values: z.infer<typeof AppointmentFormValidation>) {
     setIsLoading(true);
@@ -83,8 +136,31 @@ const AppointmentForm = ({
             `/patients/${userId}/new-appointment/success?appointmentId=${newAppointment.$id}`,
           );
         }
+      } else {
+        const appointmentToUpdate = {
+          userId,
+          appointmentId: appointment?.$id!,
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          appointment: {
+            primaryPhysician: values.primaryPhysician,
+            schedule: new Date(values.schedule),
+            status: status as Status,
+            cancellationReason: values.cancellationReason,
+          },
+          type,
+        };
+
+        const updatedAppointment = await updateAppointment(appointmentToUpdate);
+        if (updatedAppointment) {
+          setOpen && setOpen(false);
+          form.reset();
+        }
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   let buttonLabel;

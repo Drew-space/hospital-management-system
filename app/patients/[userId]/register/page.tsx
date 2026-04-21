@@ -31,7 +31,7 @@ const RegisterPage = async ({ params }: { params: { userId: string } }) => {
       </section>
 
       <Image
-        src="/assets/images/register-img.png"
+        src="/assets/images/hospital.jpg"
         height={1000}
         width={1000}
         alt="patient"
