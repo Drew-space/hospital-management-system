@@ -112,7 +112,7 @@ const RenderField = <T extends FieldValues>({
           />
           <DatePicker
             selected={field.value}
-            onChange={(date: Date | null) => field.onChange(date)}
+            onChange={(date: Date | null) => field.onChange(date ?? new Date())}
             dateFormat={dateFormat ?? "MM/dd/yyyy"}
             showTimeSelect={showTimeSelect ?? false}
             timeInputLabel="Time"
