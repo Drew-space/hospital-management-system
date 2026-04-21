@@ -33,7 +33,6 @@ export const IdentificationTypes = [
   "Military ID Card",
   "National Identity Card",
   "Passport",
-
   "Voter ID Card",
 ];
 
