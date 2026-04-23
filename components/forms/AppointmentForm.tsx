@@ -57,51 +57,6 @@ const AppointmentForm = ({
     },
   });
 
-  //   async function onSubmit(values: z.infer<typeof AppointmentFormValidation>) {
-  //     setIsLoading(true);
-
-  //     let status;
-  //     switch (type) {
-  //       case "schedule":
-  //         status = "scheduled";
-  //         break;
-  //       case "cancel":
-  //         status = "cancelled";
-  //         break;
-  //       default:
-  //         status = "pending";
-  //     }
-
-  //     try {
-  //       if (type === "create" && patientId) {
-  //         const appointmentData = {
-  //           userId,
-  //           patient: patientId,
-  //           primaryPhysician: values.primaryPhysician,
-  //           schedule: new Date(values.schedule),
-  //           reason: values.reason!,
-  //           status: status as Status,
-  //           note: values.note,
-  //         };
-
-  //         const newAppointment = await createAppointment(appointmentData);
-  //         if (newAppointment) {
-  //           form.reset();
-  //           router.push(
-  //             `/patients/${userId}/new-appointment/success?appointmentId=${newAppointment.$id}`,
-  //           );
-  //         }
-  //       }
-
-  //       if (type === "schedule" || type === "cancel") {
-  //         // call updateAppointment here later
-  //         setOpen && setOpen(false);
-  //       }
-  //     } catch (error) {
-  //       console.log("error");
-  //     }
-  //   }
-
   async function onSubmit(values: z.infer<typeof AppointmentFormValidation>) {
     setIsLoading(true);
 
