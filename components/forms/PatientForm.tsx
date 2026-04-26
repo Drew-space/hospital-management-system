@@ -78,12 +78,7 @@ const PatientForm = () => {
 
       <SubmitButton isLoading={isLoading}>Get Started</SubmitButton>
 
-      {/* <Field orientation="horizontal">
-        <Button type="button" variant="outline" onClick={() => form.reset()}>
-          Reset
-        </Button>
-        <Button type="submit">Submit</Button>
-      </Field> */}
+     
     </form>
   );
 };
